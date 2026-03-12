@@ -4,6 +4,7 @@ import com.test.btg.dto.SubscriptionRequestDTO;
 import com.test.btg.dto.TransactionResponseDTO;
 import com.test.btg.dto.UserResponseDTO;
 import com.test.btg.security.AuthenticatedUser;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.test.btg.service.FundService;
 import lombok.RequiredArgsConstructor;
@@ -26,24 +27,16 @@ public class FundController {
 
     @PostMapping("/subscribe")
     public ResponseEntity<UserResponseDTO> subscribeFund(
-            @RequestBody SubscriptionRequestDTO request,
+            @Valid @RequestBody SubscriptionRequestDTO request,
             @AuthenticationPrincipal AuthenticatedUser principal) {
 
-        log.info("POST /api/funds/subscribe - Usuario: {}, Fondo: {}",
-                 request.getUserId(), request.getFundId());
-
-        if (principal == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado");
-        }
+        log.info("POST /api/funds/subscribe - Usuario: {}, Fondo: {}", request.getUserId(), request.getFundId());
 
         if (!principal.getId().equals(request.getUserId())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autorizado para suscribir en nombre de otro usuario");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes suscribir fondos para otro usuario");
         }
 
-        UserResponseDTO response = IFundService.subscribeFund(request);
-        
-        log.info("Respuesta enviada - Usuario: {}", response.getId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(IFundService.subscribeFund(request));
     }
 
     @PostMapping("/cancel/{userId}/{transactionId}")
@@ -52,21 +45,13 @@ public class FundController {
             @PathVariable String transactionId,
             @AuthenticationPrincipal AuthenticatedUser principal) {
 
-        log.info("POST /api/funds/cancel/{}/{} - Cancelando transacción",
-                 userId, transactionId);
-
-        if (principal == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado");
-        }
+        log.info("POST /api/funds/cancel/{}/{} - Cancelando transacción", userId, transactionId);
 
         if (!principal.getId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autorizado para cancelar suscripción de otro usuario");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes cancelar suscripciones de otro usuario");
         }
 
-        UserResponseDTO response = IFundService.cancelSubscription(userId, transactionId);
-        
-        log.info("Respuesta enviada - Usuario: {}", response.getId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(IFundService.cancelSubscription(userId, transactionId));
     }
 
     @GetMapping("/history/{userId}")
@@ -74,10 +59,9 @@ public class FundController {
             @PathVariable String userId,
             @AuthenticationPrincipal AuthenticatedUser principal) {
 
-        if (principal == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Debes iniciar sesión");
-        }
+        log.info("GET /api/funds/history/{} - Obteniendo historial", userId);
 
+        // Optimización: Consistencia con los demás métodos
         if (!principal.getId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver este historial");
         }

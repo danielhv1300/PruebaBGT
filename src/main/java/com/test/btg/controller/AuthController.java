@@ -5,6 +5,7 @@ import com.test.btg.dto.LoginRequestDTO;
 import com.test.btg.model.User;
 import com.test.btg.repository.UserRepository;
 import com.test.btg.security.JwtUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +24,7 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDTO> authenticateUser(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<JwtResponseDTO> authenticateUser(@Valid @RequestBody LoginRequestDTO request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );

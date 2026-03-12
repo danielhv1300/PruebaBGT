@@ -3,6 +3,7 @@ package com.test.btg.controller;
 import com.test.btg.dto.UserRegistrationDTO;
 import com.test.btg.dto.UserResponseDTO;
 import com.test.btg.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRegistrationDTO request) {
-        log.info("POST /api/users/register - Registrando usuario: {}", request.getEmail());
+    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRegistrationDTO request) {
         UserResponseDTO response = userService.registerUser(request);
         log.info("Usuario registrado - id: {}", response.getId());
         return ResponseEntity.ok(response);
