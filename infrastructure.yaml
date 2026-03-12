@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Despliegue App BTG - Automatizado'
+
+# Esto busca la ultima AMI de Amazon Linux 2 automaticamente
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources:
+  BTGInstanceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+
+  BTGInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles: [!Ref BTGInstanceRole]
+
+  BTGSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Permitir puerto 8080'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+
+  BTGInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref LatestAmiId # Aqui usa la imagen que encontro AWS
+      IamInstanceProfile: !Ref BTGInstanceProfile
+      SecurityGroups: [!Ref BTGSecurityGroup]
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          amazon-linux-extras install docker -y
+          systemctl start docker
+          systemctl enable docker
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 906548967700.dkr.ecr.us-east-2.amazonaws.com
+          docker run -d -p 8080:8080 906548967700.dkr.ecr.us-east-2.amazonaws.com/btg-pactual-repo:latest
+
+Outputs:
+  PublicIp:
+    Description: 'IP Pública'
+    Value: !GetAtt BTGInstance.PublicIp
