@@ -11,6 +11,6 @@ public class MongoHealthCheck {
 
     @EventListener(ApplicationReadyEvent.class)
     public void checkMongoConnection() {
-        log.info("La aplicación está lista.");
+        log.info("La aplicacion esta lista.");
     }
 }

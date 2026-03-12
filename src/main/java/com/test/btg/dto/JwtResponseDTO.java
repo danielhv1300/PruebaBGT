@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegistrationDTO {
-    private String name;
+public class JwtResponseDTO {
+    private String token;
+    private String type = "Bearer";
+    private String id;
     private String email;
-    private String phoneNumber;
-    private String password;
 }
 

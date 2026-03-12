@@ -2,7 +2,7 @@ package com.test.btg.controller;
 
 import com.test.btg.dto.UserRegistrationDTO;
 import com.test.btg.dto.UserResponseDTO;
-import com.test.btg.service.IUserService;
+import com.test.btg.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final IUserService userService;
+    private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRegistrationDTO request) {

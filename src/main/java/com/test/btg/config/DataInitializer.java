@@ -52,6 +52,7 @@ public class DataInitializer implements CommandLineRunner {
                     .name("Cliente Prueba BTG")
                     .email("test@btg.com")
                     .phoneNumber("31232132312")
+                    .password("$2a$10$7Qy8n1s5X9Z6e5u1v8jO3u5X9Z6e5u1v8jO3u5X9Z6e5u1v8jO3") // "password" encriptado
                     .balance(500000.0) // Saldo inicial requerido
                     .build();
             userRepository.save(user);

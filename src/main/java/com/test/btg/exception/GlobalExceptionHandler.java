@@ -3,9 +3,11 @@ package com.test.btg.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -20,7 +22,7 @@ public class GlobalExceptionHandler {
             BalanceInsufficientException ex,
             WebRequest request) {
         
-        log.warn("⚠️ BalanceInsufficientException: {}", ex.getMessage());
+        log.warn("BalanceInsufficientException: {}", ex.getMessage());
         
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -37,7 +39,7 @@ public class GlobalExceptionHandler {
             FundAlreadySubscribedException ex,
             WebRequest request) {
         
-        log.warn("⚠FundAlreadySubscribedException: {}", ex.getMessage());
+        log.warn("FundAlreadySubscribedException: {}", ex.getMessage());
         
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -54,7 +56,7 @@ public class GlobalExceptionHandler {
             DuplicateUserException ex,
             WebRequest request) {
 
-        log.warn("⚠ DuplicateUserException: {}", ex.getMessage());
+        log.warn("DuplicateUserException: {}", ex.getMessage());
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -81,6 +83,38 @@ public class GlobalExceptionHandler {
         body.put("path", request.getDescription(false).replace("uri=", ""));
         
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(
+            ResponseStatusException ex,
+            WebRequest request) {
+
+        log.warn("Error de estado de respuesta: {} - {}", ex.getStatusCode(), ex.getReason());
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", ex.getStatusCode().value());
+        body.put("error", "Error de validación/permisos");
+        body.put("message", ex.getReason());
+
+        return new ResponseEntity<>(body, ex.getStatusCode());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentialsException(
+            BadCredentialsException ex,
+            WebRequest request) {
+
+        log.warn("Intento de login fallido: Credenciales incorrectas");
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", "Unauthorized");
+        body.put("message", "Email o contraseña incorrectos");
+
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 }
 

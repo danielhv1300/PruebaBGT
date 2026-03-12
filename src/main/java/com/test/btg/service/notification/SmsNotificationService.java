@@ -20,7 +20,7 @@ public class SmsNotificationService implements NotificationService {
         log.info("Numero: {}", userContact);
         log.info("Fondo: {}", fundName);
         log.info("Monto: ${}", formattedAmount);
-        log.info("Tipo de Operación: {}", transactionType);
+        log.info("Tipo de Operacion: {}", transactionType);
         log.info("****************************************************************");
         log.info("SMS entregado exitosamente");
         log.info("****************************************************************\n");
