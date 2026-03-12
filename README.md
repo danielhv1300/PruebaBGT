@@ -27,7 +27,27 @@ La API utiliza seguridad basada en Stateless JWT.
   acceda a datos ajenos (403 Forbidden).
 
 --------------------------------------------------------------------------
-3. DOCUMENTACIÓN DE ENDPOINTS (EJEMPLOS JSON)
+3. Estructura del Proyecto
+--------------------------------------------------------------------------
+```
+📂 btg
+├── 📂 backend-api (Spring Boot)
+│   ├── 📂 src/main/java/com/test/btg
+│   │   ├── 📂 controller      # Endpoints REST
+│   │   ├── 📂 service         # Lógica de Negocio (Strategy Pattern)
+│   │   ├── 📂 repository      # Interfaces MongoDB
+│   │   ├── 📂 model           # Entidades de Base de Datos
+│   │   ├── 📂 dto             # Objetos de Transferencia de Datos
+│   │   ├── 📂 security        # Configuración JWT y Filtros
+│   │   └── 📂 exception       # Global Error Handler
+│   └── 📄 build.gradle
+├── 📂 punto_2_sql (Relational DB)
+│   ├── 📄 init.sql            # DDL, Inserts y Queries
+│   └── 📄 docker-compose-sql.yml  # Entorno PostgreSQL
+└── 📄 README.md               # Documentación General
+```
+--------------------------------------------------------------------------
+4. DOCUMENTACIÓN DE ENDPOINTS (EJEMPLOS JSON)
 --------------------------------------------------------------------------
 
 A. REGISTRO DE USUARIO
