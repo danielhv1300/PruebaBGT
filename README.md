@@ -16,7 +16,7 @@ una arquitectura orientada a la calidad.
 * Validación: Bean Validation (@Valid) en DTOs.
 * Notificaciones: Patrón Strategy para envíos vía SMS y EMAIL.
 * Calidad: Pruebas unitarias con JUnit 5, Mockito y Datafaker.
-* Despliegue: Preparado para AWS CloudFormation mediante variables de entorno.
+* Despliegue: Preparado mediante variables de entorno.
 
 --------------------------------------------------------------------------
 2. SEGURIDAD Y AUTENTICACIÓN
@@ -96,3 +96,53 @@ Escenarios cubiertos:
 - Suscripción con validación de saldo.
 - Control de suscripciones duplicadas.
 - Resiliencia en fallos de notificación.
+
+--------------------------------------------------------------------------
+
+# Parte 2 SQL
+
+Para la parte 2 de la prueba tecnica se realizo la solicitud de generar una consulta de SQL basado en un 
+esquema entregado en la documentacion de la prueba tecnica.
+
+--------------------------------------------------------------------------
+1. EJECUCION DE DOCKER-COMPOSE PARA PRUEBA CON POSTGRESQL
+--------------------------------------------------------------------------
+
+- En la carpeta punto_2_sql se encuentra el archivo docker-compose-sql.yml, el cual se puede ejecutar con el siguiente
+comando:
+
+```bash
+  docker-compose -f docker-compose-sql.yml up -d
+```
+--------------------------------------------------------------------------
+2. CONSULTA SQL SOLICITADA
+--------------------------------------------------------------------------
+
+- Al ejecutar el docker-compose se crea la base de datos BGT y adicional el ejecuta el script de inicializacion de 
+datos, init.sql en donde se encuentra las tablas del esquema indicado para la prueba y la incersion de datos de prueba
+para la consulta solicitada.
+
+- Requerimiento: Obtener los nombres de los clientes que tienen inscrito algún producto disponible solo en
+  las sucursales que visitan.
+
+```sql
+SELECT DISTINCT c.nombre, c.apellidos
+FROM Cliente c
+JOIN Inscripcion i ON c.id = i.idCliente
+JOIN Producto p ON i.idProducto = p.id
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Disponibilidad d
+    WHERE d.idProducto = p.id
+    AND d.idSucursal NOT IN (
+        SELECT v.idSucursal
+        FROM Visitan v
+        WHERE v.idCliente = c.id
+    )
+);
+```
+La consulta retornaria la informacion de la siguiente forma:
+
+| nombre | apellidos |
+|--------|-----------|
+| Daniel | Hernandez |

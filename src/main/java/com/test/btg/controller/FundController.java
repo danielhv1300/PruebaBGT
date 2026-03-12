@@ -61,7 +61,6 @@ public class FundController {
 
         log.info("GET /api/funds/history/{} - Obteniendo historial", userId);
 
-        // Optimización: Consistencia con los demás métodos
         if (!principal.getId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver este historial");
         }
